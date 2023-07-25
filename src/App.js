@@ -1,10 +1,12 @@
 import { Component } from 'react';
+import LoginForm from './LoginForm';
 import SignUpForm from './SignUpForm';
 
 
 class App extends Component {
   state = {
-    hasSignedUp: false
+    isLogginIn: false,
+    email: ''
   }
 
   handleSignUp = (e) => {
@@ -15,13 +17,21 @@ class App extends Component {
 
       return newState;
     })
+  }
 
+  handleLogin = (email) => {
+    this.setState({
+      isLogginIn: true,
+      email,
+    });
+    console.log('App', this.state);
   }
 
   render() {
     return (
       <div className="App" >
         <SignUpForm onSignUp={this.handleSignUp} />
+        <LoginForm onLogin={this.handleLogin} />
         <pre>{JSON.stringify(this.state, null, 2)}</pre>
       </div>
     );

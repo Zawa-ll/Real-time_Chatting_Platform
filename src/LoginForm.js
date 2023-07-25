@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 
-class SignUpForm extends Component {
+class LoginForm extends Component {
     state = {
         email: '',
-        password: '',
+        password: ''
     }
 
     updateEmail = (e) => {
@@ -20,13 +20,21 @@ class SignUpForm extends Component {
         })
     }
 
+    handleLogin = (e) => {
+        e.preventDefault();
+        console.log('App', this.state);
+    }
+
+    login = (e) => {
+        e.preventDefault();
+        this.props.onLogin(this.state.email);
+    }
 
     render() {
         return (
             <>
-                <h1>SignUpForm</h1>
-                <form onSubmit={this.props.onSignUp}>
-                    <input type='email'
+                <form onSubmit={this.login}>
+                    <input type='text'
                         placeholder='Email'
                         value={this.state.email}
                         onChange={this.updateEmail} />
@@ -34,11 +42,11 @@ class SignUpForm extends Component {
                         placeholder='Password'
                         value={this.state.password}
                         onChange={this.updatePassword} />
-                    <button type='submit'>Sign Up</button>
+                    <button type='submit'>Login</button>
                 </form>
             </>
-        );
+        )
     }
 }
 
-export default SignUpForm;
+export default LoginForm;
