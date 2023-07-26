@@ -1,9 +1,29 @@
 import { Component } from 'react';
 import LoginForm from './LoginForm';
 import SignUpForm from './SignUpForm';
+import { firebaseApp, database } from './fire';
+import { ref, set } from 'firebase/database';
+
+const foodRef = ref(database, 'food');
+
+const newFoodItem = {
+  name: 'Pizza',
+  price: 10
+};
+
+
+set(foodRef, newFoodItem)
+  .then(() => {
+    console.log('Data added successfully!');
+  })
+  .catch((error) => {
+    console.error('Error adding data:', error);
+  });
 
 
 class App extends Component {
+
+
   state = {
     isLogginIn: false,
     email: ''
