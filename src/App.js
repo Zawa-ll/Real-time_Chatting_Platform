@@ -1,42 +1,37 @@
 import { Component } from 'react';
 import LoginForm from './LoginForm';
 import SignUpForm from './SignUpForm';
-import { firebaseApp, database } from './fire';
+import { firebaseApp, database, auth } from './fire';
 import { ref, set } from 'firebase/database';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
-const foodRef = ref(database, 'food');
+// const foodRef = ref(database, '/foods');
 
-const newFoodItem = {
-  name: 'Pizza',
-  price: 10
-};
+// const newFoodItem = {
+//   name: 'Apple Pies',
+//   price: 10
+// };
 
 
-set(foodRef, newFoodItem)
-  .then(() => {
-    console.log('Data added successfully!');
-  })
-  .catch((error) => {
-    console.error('Error adding data:', error);
-  });
+// set(foodRef, newFoodItem)
+//   .then(() => {
+//     console.log('Data added successfully!');
+//   })
+//   .catch((error) => {
+//     console.error('Error adding data:', error);
+//   });
 
 
 class App extends Component {
-
-
   state = {
     isLogginIn: false,
     email: ''
   }
 
-  handleSignUp = (e) => {
-    e.preventDefault();
-    this.setState(state => {
-      const newState = Object.assign({}, state);
-      newState.hasSignedUp = !newState.hasSignedUp;
-
-      return newState;
-    })
+  handleSignUp = (email, password) => {
+    createUserWithEmailAndPassword(auth, email, password)
+      .then(user => console.log(user))
+      .catch(err => console.log(err));
   }
 
   handleLogin = (email) => {
