@@ -20,14 +20,10 @@ class LoginForm extends Component {
         })
     }
 
-    handleLogin = (e) => {
-        e.preventDefault();
-        console.log('App', this.state);
-    }
-
     login = (e) => {
         e.preventDefault();
-        this.props.onLogin(this.state.email);
+        // const { email, password } = this.state;
+        this.props.onLogin(this.state);
     }
 
     render() {
