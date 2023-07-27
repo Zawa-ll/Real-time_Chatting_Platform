@@ -5,6 +5,8 @@ import { firebaseApp, database, auth } from './fire';
 import { ref, set } from 'firebase/database';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import 'bulma/css/bulma.css';
+import SideBar from './SideBar';
+import MainPanel from './MainPanel';
 
 // const foodRef = ref(database, '/foods');
 
@@ -22,12 +24,24 @@ import 'bulma/css/bulma.css';
 //     console.error('Error adding data:', error);
 //   });
 
-
 class App extends Component {
   state = {
     isLogginIn: false,
     email: '',
     uid: '',
+    rooms: {
+      'hh12': {
+        title: 'General',
+        author: 'j@j.com',
+        created: Date.now(),
+      },
+      'jj34': {
+        title: 'Jokes',
+        author: 'j@j.com',
+        created: Date.now(),
+      },
+    },
+    selectedRoom: 'hh12',
   }
 
   handleSignUp = (email, password) => {
@@ -61,30 +75,24 @@ class App extends Component {
       });
   }
 
+  setRoom = (id) => {
+    this.setState({
+      selectedRoom: id
+    })
+  }
+
   render() {
+    console.log(this.state);
     return (
-
-      <div className="columns vh-100" >
-        <div className='column is-3 hero is-primary is-paddingless'>
-          <h1>Side Bar</h1>
-          <div className='control'>
-            <button onClick={this.logout} className='button is-fullwidth'>
-              Log out
-            </button>
-          </div>
-        </div>
-
-        <div className='column hero'>
-          <div className='hero-body'>
-            <div className='columns is-centered'>
-              <div className='ccolumn is-half'>
-                <SignUpForm onSignUp={this.handleSignUp} />
-                <LoginForm onLogin={this.handleLogin} />
-              </div>
-            </div>
-          </div>
-        </div>
-
+      <div className="columns vh-100 is-gapless" >
+        <SideBar logout={this.logout}
+          rooms={this.state.rooms}
+          selectedRoom={this.state.selectedRoom}
+          setRoom={this.setRoom} />
+        <MainPanel>
+          <SignUpForm onSignUp={this.handleSignUp} />
+          <LoginForm onLogin={this.handleLogin} />
+        </MainPanel>
       </div>
     );
   }

@@ -16,6 +16,14 @@ body {
   color: black;
 }
 
+.room:hover {
+  background-color: hsl(217, 81%, 53%) !important;
+}
+
+.active-room {
+  background-color: hsl(217, 81%, 53%) !important;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
