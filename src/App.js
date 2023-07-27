@@ -3,7 +3,8 @@ import LoginForm from './LoginForm';
 import SignUpForm from './SignUpForm';
 import { firebaseApp, database, auth } from './fire';
 import { ref, set } from 'firebase/database';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import 'bulma/css/bulma.css';
 
 // const foodRef = ref(database, '/foods');
 
@@ -49,17 +50,41 @@ class App extends Component {
       .catch(err => console.error(err));
   }
 
+  logout = (e) => {
+    signOut(auth)
+      .then(() => {
+        this.setState({
+          email: '',
+          uid: '',
+          isLogginIn: false,
+        });
+      });
+  }
 
   render() {
     return (
-      <div className="App" >
-        <SignUpForm onSignUp={this.handleSignUp} />
-        <LoginForm onLogin={this.handleLogin} />
-        <pre>{JSON.stringify(this.state, null, 2)}</pre>
-        {this.state.isLogginIn ?
-          <p>You are loged in</p> :
-          <p>You are not loged in</p>
-        }
+
+      <div className="columns vh-100" >
+        <div className='column is-3 hero is-primary is-paddingless'>
+          <h1>Side Bar</h1>
+          <div className='control'>
+            <button onClick={this.logout} className='button is-fullwidth'>
+              Log out
+            </button>
+          </div>
+        </div>
+
+        <div className='column hero'>
+          <div className='hero-body'>
+            <div className='columns is-centered'>
+              <div className='ccolumn is-half'>
+                <SignUpForm onSignUp={this.handleSignUp} />
+                <LoginForm onLogin={this.handleLogin} />
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     );
   }
