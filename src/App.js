@@ -3,7 +3,7 @@ import LoginForm from './LoginForm';
 import SignUpForm from './SignUpForm';
 import { firebaseApp, database, auth } from './fire';
 import { ref, set } from 'firebase/database';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import 'bulma/css/bulma.css';
 import SideBar from './SideBar';
 import MainPanel from './MainPanel';
@@ -44,6 +44,19 @@ class App extends Component {
     selectedRoom: 'hh12',
   }
 
+  componentDidMount() {
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        const { email, uid } = user;
+        this.setState({
+          email,
+          uid,
+          isLogginIn: true
+        })
+      }
+    });
+  }
+
   handleSignUp = (email, password) => {
     createUserWithEmailAndPassword(auth, email, password)
       .then(user => console.log(user))
@@ -82,7 +95,8 @@ class App extends Component {
   }
 
   render() {
-    console.log(this.state);
+
+
     return (
       <div className="columns vh-100 is-gapless" >
         <SideBar logout={this.logout}
@@ -90,8 +104,13 @@ class App extends Component {
           selectedRoom={this.state.selectedRoom}
           setRoom={this.setRoom} />
         <MainPanel>
-          <SignUpForm onSignUp={this.handleSignUp} />
-          <LoginForm onLogin={this.handleLogin} />
+          {this.state.isLogginIn ?
+            <div>Here are some messages</div> :
+            <div>
+              <SignUpForm onSignUp={this.handleSignUp} />
+              <LoginForm onLogin={this.handleLogin} />
+            </div>
+          }
         </MainPanel>
       </div>
     );
