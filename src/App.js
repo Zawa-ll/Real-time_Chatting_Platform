@@ -2,7 +2,7 @@ import { Component } from 'react';
 import LoginForm from './LoginForm';
 import SignUpForm from './SignUpForm';
 import { firebaseApp, database, auth } from './fire';
-import { get, push, ref, set, onValue } from 'firebase/database';
+import { get, push, ref, set, onValue, orderByChild, query, equalTo } from 'firebase/database';
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import 'bulma/css/bulma.css';
 import SideBar from './SideBar';
@@ -16,26 +16,9 @@ class App extends Component {
     wantsToLogin: true,
     email: '',
     uid: '',
-    rooms: {
-
-    },
-    selectedRoom: 'hh12',
-    messages: {
-      'm100': {
-        author: '11123wkfhsdjf',
-        email: 'j@j.com',
-        roomId: 'hh12',
-        text: 'hello everyone',
-        created: Date.now(),
-      },
-      'm200': {
-        author: '11123wkfhsdjf',
-        email: 'd@d.com',
-        roomId: 'hh12',
-        text: 'Hi HO',
-        created: Date.now(),
-      },
-    }
+    rooms: {},
+    selectedRoom: '',
+    messages: {}
   }
 
   loadData = () => {
@@ -43,33 +26,65 @@ class App extends Component {
       if (snapshot.exists()) {
         const rooms = snapshot.val();
         console.log(rooms);
-        const selectedRoom = Object.keys(rooms)[0];
+        const selectedRoom = Object.keys(rooms)[0]; // Get the first room key
         this.setState({
           rooms: rooms,
-          selectedRoom: selectedRoom,
+          selectedRoom: selectedRoom, // Set the selectedRoom state to the first room
         });
+        this.loadMessages(selectedRoom); // Load messages for the first room
       } else {
         console.log("No data available");
       }
     }, {
-      onlyOnce: false
+      onlyOnce: false,
       // Optional: To fetch data only once initially, remove this line if you want real-time updates.
     });
   };
 
+
+
+  loadMessages = (selectedRoom) => {
+
+    if (selectedRoom) {
+      const messagesQuery = query(messageRef, orderByChild('roomId'), equalTo(selectedRoom));
+
+      onValue(
+        messagesQuery,
+        (snapshot) => {
+          if (snapshot.exists()) {
+            const messages = snapshot.val();
+            console.log(messages);
+            this.setState({ messages });
+          } else {
+            console.log("No messages available for the selected room");
+            this.setState({ messages: {} }); // Set messages to an empty object if no messages found
+          }
+        },
+        {
+          onlyOnce: false
+          // Optional: To fetch data only once initially, remove this line if you want real-time updates.
+        }
+      );
+    }
+  };
+
+
+
   componentDidMount() {
-    onAuthStateChanged(auth, user => {
+    onAuthStateChanged(auth, (user) => {
       if (user) {
         const { email, uid } = user;
         this.setState({
           email,
           uid,
-          isLogginIn: true
-        })
+          isLogginIn: true,
+        });
         this.loadData();
+        this.loadMessages(this.state.selectedRoom); // Load messages for the initially selected room
       }
     });
   }
+
 
   handleSignUp = (email, password) => {
     createUserWithEmailAndPassword(auth, email, password)
@@ -105,8 +120,11 @@ class App extends Component {
   setRoom = (id) => {
     this.setState({
       selectedRoom: id
-    })
+    });
+
+    this.loadMessages(id); // Call loadMessages to fetch messages for the selected room
   }
+
 
   sendMessage = (message) => {
     const newMessageRef = push(messageRef); // Create a new unique reference with push()
