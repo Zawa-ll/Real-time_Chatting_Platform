@@ -1,15 +1,16 @@
 import React from 'react';
+import AddRoomForm from './AddRoomForm';
 
 
 const Room = ({ room, selectedRoom, setRoom }) => {
     const styles = selectedRoom === room.id ?
         'active-room' : 'room'
     return (
-        <li><a className={styles} onClick={() => setRoom(room.id)}>{room.title}</a></li>
+        <li><a className={styles} onClick={() => setRoom(room.id)}>{room.name}</a></li>
     )
 }
 
-const RoomList = ({ rooms, selectedRoom, setRoom }) => {
+const RoomList = ({ rooms, selectedRoom, setRoom, addRoom }) => {
 
     return (
         <div style={{ padding: '10px' }}>
@@ -24,6 +25,12 @@ const RoomList = ({ rooms, selectedRoom, setRoom }) => {
                             setRoom={setRoom}
                         />)}
                 </ul>
+                <div style={{ marginTop: '30px' }}>
+                    <p className='menu-label has-text-white is-size-5'>
+                        Add a Room
+                    </p>
+                    <AddRoomForm addRoom={addRoom} />
+                </div>
             </aside>
         </div>
     );

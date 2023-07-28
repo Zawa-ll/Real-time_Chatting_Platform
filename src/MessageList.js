@@ -19,7 +19,7 @@ const Message = ({ message }) => {
 
 const MessageList = ({ messages }) => {
     return (
-        <ul style={{ height: '90vh' }}>
+        <ul style={{ height: '80vh' }}>
             {Object.keys(messages)
                 .map(messageKey => ({ ...messages[messageKey], id: messageKey }))
                 .map(message => <Message key={message.id} message={message}>{message.text}</Message>)

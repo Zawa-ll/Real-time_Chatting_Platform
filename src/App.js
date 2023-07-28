@@ -2,45 +2,22 @@ import { Component } from 'react';
 import LoginForm from './LoginForm';
 import SignUpForm from './SignUpForm';
 import { firebaseApp, database, auth } from './fire';
-import { ref, set } from 'firebase/database';
+import { get, push, ref, set, onValue } from 'firebase/database';
 import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import 'bulma/css/bulma.css';
 import SideBar from './SideBar';
 import MainPanel from './MainPanel';
 import ChatPanel from './ChatPanel';
-
-// const foodRef = ref(database, '/foods');
-
-// const newFoodItem = {
-//   name: 'Apple Pies',
-//   price: 10
-// };
-
-
-// set(foodRef, newFoodItem)
-//   .then(() => {
-//     console.log('Data added successfully!');
-//   })
-//   .catch((error) => {
-//     console.error('Error adding data:', error);
-//   });
+import { messageRef, roomRef } from './fire';
 
 class App extends Component {
   state = {
     isLogginIn: false,
+    wantsToLogin: true,
     email: '',
     uid: '',
     rooms: {
-      'hh12': {
-        title: 'General',
-        author: 'j@j.com',
-        created: Date.now(),
-      },
-      'jj34': {
-        title: 'Jokes',
-        author: 'j@j.com',
-        created: Date.now(),
-      },
+
     },
     selectedRoom: 'hh12',
     messages: {
@@ -61,6 +38,25 @@ class App extends Component {
     }
   }
 
+  loadData = () => {
+    onValue(roomRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const rooms = snapshot.val();
+        console.log(rooms);
+        const selectedRoom = Object.keys(rooms)[0];
+        this.setState({
+          rooms: rooms,
+          selectedRoom: selectedRoom,
+        });
+      } else {
+        console.log("No data available");
+      }
+    }, {
+      onlyOnce: false
+      // Optional: To fetch data only once initially, remove this line if you want real-time updates.
+    });
+  };
+
   componentDidMount() {
     onAuthStateChanged(auth, user => {
       if (user) {
@@ -70,6 +66,7 @@ class App extends Component {
           uid,
           isLogginIn: true
         })
+        this.loadData();
       }
     });
   }
@@ -111,22 +108,70 @@ class App extends Component {
     })
   }
 
+  sendMessage = (message) => {
+    const newMessageRef = push(messageRef); // Create a new unique reference with push()
+
+    set(newMessageRef, message)
+      .then(() => {
+        console.log('Message sent successfully!');
+      })
+      .catch((error) => {
+        console.error('Error sending message:', error);
+      });
+  };
+
+  addRoom = (roomName) => {
+    const room = {
+      author: this.state.uid,
+      name: roomName,
+      create: Date.now(),
+    };
+
+    if (!roomRef) {
+      console.error('roomRef is not defined. Check your Firebase initialization.');
+      return;
+    }
+
+    const newRoomRef = push(roomRef); // Create a new unique reference with push()
+
+    set(newRoomRef, room)
+      .then(() => {
+        console.log('New room added successfully!');
+      })
+      .catch((error) => {
+        console.error('Error adding new room:', error);
+      });
+  };
+
+
+
+
   render() {
     return (
+
       <div className="columns vh-100 is-gapless" >
         <SideBar logout={this.logout}
           rooms={this.state.rooms}
           selectedRoom={this.state.selectedRoom}
-          setRoom={this.setRoom} />
-        <MainPanel>
-          {this.state.isLogginIn ?
-            <ChatPanel messages={this.state.messages} /> :
-            <div>
-              <SignUpForm onSignUp={this.handleSignUp} />
-              <LoginForm onLogin={this.handleLogin} />
-            </div>
-          }
-        </MainPanel>
+          setRoom={this.setRoom}
+          addRoom={this.addRoom} />
+        {this.state.isLogginIn ?
+          <MainPanel>
+            <ChatPanel messages={this.state.messages}
+              roomId={this.state.selectedRoom}
+              email={this.state.email}
+              uid={this.state.uid}
+              sendMessage={this.sendMessage}
+            />
+          </MainPanel>
+          : <MainPanel>{
+            this.state.wantsToLogin ?
+              <LoginForm onLogin={this.handleLogin}
+                goToSignUp={() => this.setState({ wantsToLogin: false })} /> :
+              <SignUpForm onSignUp={this.handleSignUp}
+                goToLogIn={() => this.setState({ wantsToLogin: true })} />
+          }</MainPanel>
+        }
       </div>
     );
   }

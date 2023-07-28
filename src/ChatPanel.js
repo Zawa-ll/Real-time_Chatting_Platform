@@ -4,9 +4,13 @@ import SendMessageForm from './SendMessageForm';
 
 const ChatPanel = (props) => {
     return (
-        <div>
+        <div className='column is-fullwidth'>
             <MessageList messages={props.messages} />
-            <SendMessageForm />
+            <SendMessageForm
+                sendMessage={props.sendMessage}
+                email={props.email}
+                roomId={props.roomId}
+                uid={props.uid} />
         </div>
     )
 }
