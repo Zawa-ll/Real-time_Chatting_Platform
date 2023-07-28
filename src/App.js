@@ -7,6 +7,7 @@ import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndP
 import 'bulma/css/bulma.css';
 import SideBar from './SideBar';
 import MainPanel from './MainPanel';
+import ChatPanel from './ChatPanel';
 
 // const foodRef = ref(database, '/foods');
 
@@ -42,6 +43,22 @@ class App extends Component {
       },
     },
     selectedRoom: 'hh12',
+    messages: {
+      'm100': {
+        author: '11123wkfhsdjf',
+        email: 'j@j.com',
+        roomId: 'hh12',
+        text: 'hello everyone',
+        created: Date.now(),
+      },
+      'm200': {
+        author: '11123wkfhsdjf',
+        email: 'd@d.com',
+        roomId: 'hh12',
+        text: 'Hi HO',
+        created: Date.now(),
+      },
+    }
   }
 
   componentDidMount() {
@@ -95,8 +112,6 @@ class App extends Component {
   }
 
   render() {
-
-
     return (
       <div className="columns vh-100 is-gapless" >
         <SideBar logout={this.logout}
@@ -105,7 +120,7 @@ class App extends Component {
           setRoom={this.setRoom} />
         <MainPanel>
           {this.state.isLogginIn ?
-            <div>Here are some messages</div> :
+            <ChatPanel messages={this.state.messages} /> :
             <div>
               <SignUpForm onSignUp={this.handleSignUp} />
               <LoginForm onLogin={this.handleLogin} />
